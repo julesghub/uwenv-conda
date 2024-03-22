@@ -1,0 +1,112 @@
+{% set version = "0.9" %}
+{% set build = 0 %}
+
+{% set mpi = mpi or 'mpich' %}
+{% if scalar == "real" %}
+{% set build = build + 100 %}
+{% endif %}
+
+package:
+  name: uw3_env
+  version: {{ version }}
+
+source:
+  path: /home/julian/codes/petsc.git/main
+    #sha256: fb4e637758737af910b05f30a785245633916cd0a929b7b6447ad1028da4ea5a
+    #url: https://gitlab.com/petsc/petsc/-/archive/main/petsc-main.tar.gz 
+    #sha256: 78edf66efcc136a783c761ac46ece82a892cb4fdd88efd267a5595b6c47da8c0
+    #patches:
+    #  - ignore-not-invalid.patch
+    #  - no-cppflags-in-pkgconfig-cflags.patch
+
+build:
+  skip: true  # [win]
+  number: {{ build }}
+  string: py{{ python }}_mpi_{{ mpi }}_h{{ PKG_HASH }}_{{ build }}
+  run_exports:
+    - {{ pin_subpackage('uw3_env', max_pin='x.x') }}
+    - petsc * {{ scalar }}_*
+      #  track_features:
+      #    - petsc_complex  # [scalar == "complex"]
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - make
+    - pkg-config
+    - python
+    - numpy
+    - cython
+    - gnuconfig   # [unix]
+    - {{ mpi }}  # [mpi == 'openmpi' and build_platform != target_platform]
+  host:
+    - numpy
+    - cython
+    - libcblas
+    - cmake
+    - {{ mpi }}
+    - yaml
+    # FIXME: unpin hypre after next petsc release
+    - hypre 2.28
+    - libptscotch
+    - superlu
+    - superlu_dist
+    - libscotch
+    - mumps-mpi
+    - suitesparse
+    - hdf5 * mpi_{{ mpi }}_*
+    - fftw * mpi_{{ mpi }}_*
+  run:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ mpi }}
+    - numpy
+    - cython
+    - yaml
+    - hypre
+    - libptscotch
+    - superlu
+    - superlu_dist
+    - libscotch
+    - mumps-mpi
+    - suitesparse
+    - hdf5 * mpi_{{ mpi }}_*
+    - fftw * mpi_{{ mpi }}_*
+    - mpi4py
+    - h5py * mpi_{{ mpi }}_*
+    - pytest
+    - jupyter
+    - jupytext
+  script_env:
+    - PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
+
+  test:
+    requires:
+      - pkg-config
+      - {{ compiler('c') }}
+      - {{ compiler('cxx') }}
+      - {{ compiler('fortran') }}
+      - make
+    files:
+      - tests/ex1.c
+      - tests/ex1f.F90
+      - tests/makefile
+    commands:
+      - pkg-config --validate PETSc
+      - pkg-config --cflags PETSc
+      - pkg-config --libs PETSc
+ 
+about:
+  home: https://www.underworldcode.org/
+  summary: Underworld 3 development environment
+  license: BSD-2-Clause
+  license_file: LICENSE
+  license_family: BSD
+  dev_url: https://github.com/underworldcode/underworld3
+  doc_url: https://underworldcode.github.io/underworld3/
+
+extra:
+  recipe-maintainers:
+    - jgiordani

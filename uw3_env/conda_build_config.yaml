@@ -1,0 +1,26 @@
+mpi:
+  - openmpi
+  - mpich
+
+scalar:
+  - real
+
+python:
+  - 3.11
+
+pin_run_as_build:
+  python:
+    max_pin: x.x
+  numpy:
+    max_pin: x.x
+  hypre:
+    max_pin: x.x.x
+  metis:
+    max_pin: x.x
+  parmetis:
+    max_pin: x.x
+  scalapack:
+    max_pin: x.x
+  suitesparse:
+    max_pin: x.x  # [not osx]
+    max_pin: x.x.x  # [osx]

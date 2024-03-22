@@ -1,0 +1,11 @@
+This is a minimal conda environment to begin Underworld3 development in.
+
+The idea with this recipe is create an envrionment where all the dependencies to compile Underworld3 exist in a single conda environment.
+
+To build this environment, first edit the `meta.yaml` file to point to the correct petsc version on your local machine. i.e. >petsc-3.20.5
+Then run the following command:
+` conda build . -c conda-forge `
+
+In future, once petsc 3.21 is released, we can update the recipe to get petsc from conda-forge rather than building it as part of the `conda build` phase.
+
+This recipe is a clone of the original petsc feedstock repository at https://github.com/conda-forge/petsc-feedstock
